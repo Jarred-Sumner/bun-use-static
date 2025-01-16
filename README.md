@@ -1,17 +1,17 @@
-# bun-static
+# bun-use-static
 
 Bundle frontend applications in existing Express, Fastify, and other Node.js frameworks with Bun.
 
 To install:
 
 ```bash
-bun install bun-static
+bun install bun-use-static
 ```
 
 ### Express usage:
 
 ```ts
-import useStatic from "bun-static";
+import useStatic from "bun-use-static";
 import app from "./my-express-app";
 import mySinglePageApp from "./my-single-page-app.html";
 
@@ -81,3 +81,4 @@ export default useStatic;
 ```
 
 See [the docs](https://bun.sh/docs/bundler/fullstack) for more information.
+
