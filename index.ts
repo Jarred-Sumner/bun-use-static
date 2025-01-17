@@ -1,13 +1,17 @@
 export function useStatic(server, routes) {
   // Use an internal API to get the Bun.serve() instance from the node:http
-  // Server
   let bunServer = server?.[Symbol.for("::bunternal::")];
+
   if (!bunServer) {
-    if (
-      typeof server?.reload === "function" &&
-      typeof Bun.serve === "function"
-    ) {
-      bunServer = server;
+    if (typeof server?.once === "function") {
+      server.once("listening", () => {
+        bunServer = server[Symbol.for("::bunternal::")];
+        if (!bunServer) {
+          throw new Error("Expected a node:http Server or server subclass.");
+        }
+        bunServer.reload({ static: routes });
+      });
+      return;
     }
   }
 

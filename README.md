@@ -51,21 +51,25 @@ bun --experimental-html my-app.js
 
 ### How this works:
 
-Under the hood, `useStatic` calls `reload` on the Bun.serve() instance that Bun.serve() uses internally. `useStatic`
+Under the hood, `useStatic` calls `reload` on the Bun.serve() instance that node:http uses internally.
 
 Here is the code in the library:
 
 ```ts
 export function useStatic(server, routes) {
   // Use an internal API to get the Bun.serve() instance from the node:http
-  // Server
   let bunServer = server?.[Symbol.for("::bunternal::")];
+
   if (!bunServer) {
-    if (
-      typeof server?.reload === "function" &&
-      typeof Bun.serve === "function"
-    ) {
-      bunServer = server;
+    if (typeof server?.once === "function") {
+      server.once("listening", () => {
+        bunServer = server[Symbol.for("::bunternal::")];
+        if (!bunServer) {
+          throw new Error("Expected a node:http Server or server subclass.");
+        }
+        bunServer.reload({ static: routes });
+      });
+      return;
     }
   }
 
@@ -81,4 +85,3 @@ export default useStatic;
 ```
 
 See [the docs](https://bun.sh/docs/bundler/fullstack) for more information.
-
